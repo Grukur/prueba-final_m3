@@ -1,29 +1,43 @@
-$(document).ready(function() {
+$(document).ready(function () {
 
-    $('#btnSend').on('click', function(e){
+    $('#btnSend').on('click', function (e) {
         e.preventDefault();
+
+        const regexValidacion = /^[0-9]+$/i;
         let idSuperHero = $('#pokeName').val();
-        console.log(idSuperHero);
+        if (regexValidacion.test(idSuperHero)) {
+            //SI ID OR NOMBR ES VÁLIDO
+            getHero(idSuperHero);
+        } else {
+            failData(idSuperHero)
+            console.log('Error validacion con regex');
+        };
+
+    })
+    const getHero = (idSuperHero) => {
+
         $.ajax({
-            type:'GET',
-            url: 'https://www.superheroapi.com/api.php/3525635500807579/'+idSuperHero,
+            type: 'GET',
+            url: 'https://www.superheroapi.com/api.php/3525635500807579/' + idSuperHero,
             contentType: 'application/json',
             dataType: 'json',
-            success: (data)=>{
-                console.log(data);
-                renderData(data);
-            }, 
-            error:(error)=>{
-                failData(error)
+            success: (data) => {
+                if (data != undefined || data != null) {
+                    renderData(data);
+                }
+            },            
+            error: (error) => {
+                console.log('Error, data llego sin datos')
             }
-        })
-    })
+        });
+    }
 
-    const renderData = (data)=>{
-        if(data == undefined || data == null){
+    const renderData = (data) => {
+        if (data == undefined || data == null) {
             alert('No se encontraron datos');
             return;
         }
+        $('#pokeName').val('')
         dataGraph(data)
 
         $('#card-title').text(`Nombre: ${data.name}`)
@@ -38,15 +52,15 @@ $(document).ready(function() {
         )
     }
 
-    const dataGraph = (data)=>{
-        let {powerstats:stats} = data;
+    const dataGraph = (data) => {
+        let { powerstats: stats } = data;
         let powerstats = data.powerstats;
 
         let statsdata = [];
-        for(let key in powerstats){
-            statsdata.push({label:key, y:Number(powerstats[key])})
-        }   
-        
+        for (let key in powerstats) {
+            statsdata.push({ label: key, y: Number(powerstats[key]) })
+        }
+
         let chart = new CanvasJS.Chart("graphContainer", {
             animationEnabled: true,
             title: {
@@ -54,9 +68,17 @@ $(document).ready(function() {
             },
             data: [{
                 type: "bar",
-                dataPoints:statsdata
+                dataPoints: statsdata
             }]
         });
         return chart.render();
+    }
+
+    const failData = (idSuperHero) => {
+        $('#modalLabel').text(`El Heroe con id: ${idSuperHero} no existe`);
+        $('#exampleModal').modal('show');
+        $('#modalBody').text(`Por favor introduce un ID numérico valido y menor a 732`);
+        $('#pokeName').val('');
+        console.log('Error al capturar datos del endpoint ')
     }
 })
