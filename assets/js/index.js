@@ -5,12 +5,11 @@ $(document).ready(function () {
 
         const regexValidacion = /^[0-9]+$/i;
         let idSuperHero = $('#pokeName').val();
-        if (regexValidacion.test(idSuperHero)) {
+        if (regexValidacion.test(idSuperHero) && idSuperHero<732 && idSuperHero > 0) {
             //SI ID OR NOMBR ES VÁLIDO
             getHero(idSuperHero);
         } else {
-            failData(idSuperHero)
-            console.log('Error validacion con regex');
+            failRegex(idSuperHero)
         };
 
     })
@@ -74,11 +73,11 @@ $(document).ready(function () {
         return chart.render();
     }
 
-    const failData = (idSuperHero) => {
+    const failRegex = (idSuperHero) => {
         $('#modalLabel').text(`El Heroe con id: ${idSuperHero} no existe`);
         $('#exampleModal').modal('show');
         $('#modalBody').text(`Por favor introduce un ID numérico valido y menor a 732`);
         $('#pokeName').val('');
-        console.log('Error al capturar datos del endpoint ')
+        console.log('Error al capturar datos por fracaso de validacion en regex ')
     }
 })
